@@ -1,0 +1,25 @@
+{
+  "name": "@codechem/strapi-fluent-rest-api",
+  "private": false,
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "vitest"
+  },
+  "author": "Ilija Boshkov <ilija@codechem.com>",
+  "license": "MIT",
+  "description": "Fluent API for Strapi REST API",
+  "peerDependencies": {
+    "qs": "^6.13.1",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.13",
+    "@types/qs": "^6.9.17",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.6"
+  }
+}
