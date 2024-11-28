@@ -17,12 +17,22 @@ export type FilterOperator = {
     $endsWith?: string;
 };
 
-export type Filters = {
-    $and?: Filters[];
-    $or?: Filters[];
-    $not?: Filters[];
+export type Field<T> = Extract<keyof T, string>;
 
-    [key: string]: Filters | Filters[] | FilterOperator | undefined;
+export type Operators = Extract<keyof FilterOperator, string>;
+
+export type FieldWithOperator<T> = Field<T> | `${Field<T>}.${Field<T>}` | `${Field<T>}.${Operators}`;
+
+export type FieldWithSort<T> = Field<T> | `${Field<T>}:${"asc" | "desc"}`;
+
+type AllKeys<T> = {
+    [k in keyof T]: Filters<T> | Filters<T>[] | FilterOperator | undefined;
+}
+
+export type Filters<T=any> = AllKeys<T> & {
+    $and?: Filters<T>[];
+    $or?: Filters<T>[];
+    $not?: Filters<T>[];
 };
 
 export type Pagination = {
@@ -33,14 +43,14 @@ export type Pagination = {
     limit?: number;
 };
 
-export type Populate = {
-    [key: string]: StrapiQuery | string[];
+export type Populate<T> = {
+    [key in keyof T]: StrapiQuery | string[];
 };
 
-export type StrapiQuery = {
-    sort?: string[];
-    filters?: Filters;
-    populate?: Populate | string[];
+export type StrapiQuery<T=any> = {
+    sort?: FieldWithSort<T>[];
+    filters?: Filters<T>;
+    populate?: Populate<T> | string[];
     fields?: string[];
     pagination?: Pagination;
     status?: "draft" | "published";

@@ -1,22 +1,24 @@
 import { stringify } from "qs";
 import { set } from "lodash";
-import { Filters, StrapiQuery } from "./types";
+import { Field, FieldWithOperator, FilterOperator, Filters, Populate, StrapiQuery } from "./types";
 
-class StrapiQueryBuilder<T> {
-  private query: StrapiQuery = {};
+type QueryCallback<T> = (query: StrapiQueryBuilder<T>) => StrapiQueryBuilder<T>;
+
+class StrapiQueryBuilder<T = any> {
+  private query: StrapiQuery<T> = {};
 
   constructor(public resourceName: string) {}
 
   private mergeFilter(addition: any) {
-    this.query.filters = this.query.filters ?? {};
+    this.query.filters = this.query.filters ?? {} as Filters<T>;
     this.query.filters = { ...this.query.filters, ...addition };
   }
 
   private op(
     op: "$and" | "$or" | "$not",
-    ...incomingFilter: Record<string, any>[]
+    ...incomingFilter: Filters<T>[]
   ) {
-    this.query.filters = this.query.filters ?? {};
+    this.query.filters = this.query.filters ?? {} as Filters<T>;
 
     this.query.filters[op] = this.query.filters[op] ?? [];
 
@@ -37,27 +39,34 @@ class StrapiQueryBuilder<T> {
     return this;
   }
 
-  where(field: string, value: any) {
-    this.query.filters = this.query.filters ?? {};
+  where(field: FieldWithOperator<T>, value: string | boolean | number | Array<any> | FilterOperator) {
+    this.query.filters = this.query.filters ?? {} as Filters<T>;
     set(this.query.filters, field, value);
     return this;
   }
 
-  sort(field: string, direction: "asc" | "desc" = "asc") {
+  whereQ(field: FieldWithOperator<T>, fn: QueryCallback<T>) {
+    this.query.filters = this.query.filters ?? {} as Filters<T>;
+    const qb = fn(new StrapiQueryBuilder<T>(field));
+    set(this.query.filters, field, qb.get().filters);
+    return this;
+  }
+
+  sort(field: Field<T>, direction: "asc" | "desc" = "asc") {
     this.query.sort = this.query.sort ?? [];
     this.query.sort.push(`${field}:${direction}`);
     return this;
   }
 
-  and(...incomingFilter: Filters[]) {
+  and(...incomingFilter: Filters<T>[]) {
     return this.op("$and", ...incomingFilter);
   }
 
-  or(...incomingFilter: Filters[]) {
+  or(...incomingFilter: Filters<T>[]) {
     return this.op("$or", ...incomingFilter);
   }
 
-  not(...incomingFilter: Filters[]) {
+  not(...incomingFilter: Filters<T>[]) {
     return this.op("$not", ...incomingFilter);
   }
 
@@ -113,15 +122,16 @@ class StrapiQueryBuilder<T> {
     return this;
   }
 
-  populateRelation(relation: string, query: StrapiQuery) {
-    this.query.populate = this.query.populate ?? {};
-    this.query.populate[relation] = query;
+  populateRelation(relation: Field<T>, query: StrapiQuery<T>) {
+    this.query.populate = this.query.populate ?? {} as Populate<T>;
+    this.query.populate[relation as string] = query;
     return this;
   }
 
-  populateQuery<PT>(otherBuilder: StrapiQueryBuilder<PT>) {
-    this.query.populate = this.query.populate ?? {};
-    this.query.populate[otherBuilder.resourceName] = otherBuilder.get();
+  populateQ<P=any>(fieldName: string, fn: QueryCallback<P>) {
+    this.query.populate = this.query.populate ?? {} as Populate<T>;
+    const qb = fn(query(fieldName));
+    this.query.populate[qb.resourceName] = qb.get();
     return this;
   }
 
@@ -142,5 +152,5 @@ class StrapiQueryBuilder<T> {
   }
 }
 
-export const query = (resourceName: string) =>
-  new StrapiQueryBuilder(resourceName);
+export const query = <T = any>(resourceName: string) =>
+  new StrapiQueryBuilder<T>(resourceName);

@@ -19,9 +19,7 @@ describe("Population Operations", () => {
   });
 
   test("should populate a relation with filters", () => {
-    const result = query("books").populateQuery(
-      query("user").where("name.$eq", "John Doe")
-    );
+    const result = query("books").populateQ("user", user => user.where("name.$eq", "John Doe"));
 
     expect(result.get()).toEqual({
       populate: {
@@ -37,12 +35,11 @@ describe("Population Operations", () => {
   });
 
   test("should populate nested relations with filters", () => {
-    const result = query("books").populateQuery(
-      query("user")
+    const result = query("books").populateQ("user", (user) =>
+      user
         .where("name.$eq", "John Doe")
-        .populateQuery(
-            query("friends")
-                .where("name.$eq", "Jane Doe")
+        .populateQ("friends", (friend) =>
+          friend.where("name.$eq", "Jane Doe")
         )
     );
 
