@@ -108,16 +108,16 @@ class StrapiQueryBuilder<T = any> {
     return this;
   }
 
-  fields(...fields: string[]) {
+  fields(...fields: Field<T>[]) {
     this.query.fields = fields;
     return this;
   }
 
-  select(...fieldArgs: string[]) {
+  select(...fieldArgs: Field<T>[]) {
     return this.fields(...fieldArgs);
   }
 
-  populate(...relations: string[]) {
+  populate(...relations: Field<T>[]) {
     this.query.populate = relations;
     return this;
   }

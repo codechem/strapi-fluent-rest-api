@@ -108,7 +108,7 @@ const result = query('templates')
 
 ### Population of Relations
 
-You can populate related resources using the `populate` method. To populate nested relations or apply filters to related resources, use `populateQuery`:
+You can populate related resources using the `populate` method. To populate nested relations or apply filters to related resources, use `populateQ`:
 
 ```typescript
 // Populate a single relation
@@ -118,15 +118,13 @@ const result = query('books').populate('user');
 const result = query('books').populate('user', 'readers.books');
 
 // Populate relations with filters
-const result = query('books').populateQuery(
-    query('user').where('name.$eq', 'John Doe')
-);
+const result = query('books').populateQ('user', user => user.where('name.$eq', 'John Doe'));
 
 // Populate nested relations with filters
-const result = query('books').populateQuery(
+const result = query('books').populateQ(
     query('user')
         .where('name.$eq', 'John Doe')
-        .populateQuery(query('friends').where('name.$eq', 'Jane Doe'))
+        .populateQ('friends', friend => friend..where('name.$eq', 'Jane Doe'))
 );
 ```
 
