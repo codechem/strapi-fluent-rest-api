@@ -1,7 +1,8 @@
 {
   "name": "@codechem/strapi-fluent-rest-api",
   "private": false,
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "repository": "https://github.com/codechem/strapi-fluent-rest-api",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
