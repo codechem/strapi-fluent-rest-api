@@ -21,15 +21,21 @@ export type Field<T> = Extract<keyof T, string>;
 
 export type Operators = Extract<keyof FilterOperator, string>;
 
-export type FieldWithOperator<T> = Field<T> | `${Field<T>}.${Field<T>}` | `${Field<T>}.${Operators}`;
+export type FieldWithOperator<T> = Field<T> | `${Field<T>}.${Operators}`;
 
 export type FieldWithSort<T> = Field<T> | `${Field<T>}:${"asc" | "desc"}`;
+
+type RawValue = string | number | boolean | Array<any>;
+
+type StringKeyFilter = {
+    [key: string]: FilterOperator | RawValue | undefined;
+}
 
 type AllKeys<T> = {
     [k in keyof T]: Filters<T> | Filters<T>[] | FilterOperator | undefined;
 }
 
-export type Filters<T=any> = AllKeys<T> & {
+export type Filters<T=any> = StringKeyFilter & AllKeys<T> & {
     $and?: Filters<T>[];
     $or?: Filters<T>[];
     $not?: Filters<T>[];

@@ -2,6 +2,44 @@ import { describe, test, expect } from "vitest";
 import { query } from "..";
 
 describe("Filtering Operations", () => {
+  test("For blog", () => {
+    const targetQuery = {
+      filters: {
+        $or: [
+          {
+            date: {
+              $eq: "2020-01-01",
+            },
+          },
+          {
+            date: {
+              $eq: "2020-01-02",
+            },
+          },
+        ],
+        author: {
+          name: {
+            $eq: "Kai doe",
+          },
+        },
+      },
+    };
+
+    const result = query("blogs")
+      .where("author.name.$eq", "Kai doe")
+      .or({
+        date: {
+          $eq: "2020-01-01",
+        },
+      })
+      .or({
+        date: {
+          $eq: "2020-01-02",
+        },
+      });
+
+    expect(result.get()).toEqual(targetQuery);
+  });
   test("should return empty object when no filters are applied", () => {
     const result = query("templates").get();
     expect(result).toEqual({});
