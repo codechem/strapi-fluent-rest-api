@@ -50,7 +50,7 @@ describe("Type Safety", () => {
   test("should maintain type safety for sorting operations", () => {
     const result = query<User>("users").sort("name").get();
     expect(result).toEqual({
-      sort: ["name:asc"],
+      sort: ["name"],
     });
   });
 });

@@ -27,7 +27,7 @@ describe("Combined Operations", () => {
           $in: [1, 2, 3],
         },
       },
-      sort: ["id:asc", "createdAt:desc"],
+      sort: ["id", "createdAt:desc"],
       pagination: {
         page: 1,
         pageSize: 10,

@@ -52,10 +52,24 @@ class StrapiQueryBuilder<T = any> {
     return this;
   }
 
-  sort(field: Field<T>, direction: "asc" | "desc" = "asc") {
+  sort(field: Field<T>, direction?: "asc" | "desc") {
     this.query.sort = this.query.sort ?? [];
-    this.query.sort.push(`${field}:${direction}`);
+
+    if (direction) {
+      this.query.sort.push(`${field}:${direction}`);
+    } else {
+      this.query.sort.push(field);
+    }
+
     return this;
+  }
+
+  desc(field: Field<T>) {
+    return this.sort(field, "desc");
+  }
+
+  asc(field: Field<T>) {
+    return this.sort(field, "asc");
   }
 
   and(...incomingFilter: Filters<T>[]) {
@@ -153,4 +167,6 @@ class StrapiQueryBuilder<T = any> {
 }
 
 export const query = <T = any>(resourceName: string) =>
+  new StrapiQueryBuilder<T>(resourceName);
+export const filter = <T = any>(resourceName: string) =>
   new StrapiQueryBuilder<T>(resourceName);
